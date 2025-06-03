@@ -6,7 +6,7 @@
 /*   By: sabsanto <sabsanto@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 19:21:10 by sabsanto          #+#    #+#             */
-/*   Updated: 2025/06/03 14:52:25 by sabsanto         ###   ########.fr       */
+/*   Updated: 2025/06/03 17:12:41 by sabsanto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,25 @@
 # define PHILO_H
 
 # include <pthread.h>
-# include <stdlib.h>
 # include <stdio.h>
+# include <stdlib.h>
 # include <unistd.h>
 # include <sys/time.h>
 # include <stdint.h>
 
-// Forward declaration
 typedef struct s_data	t_data;
-typedef struct s_philo	t_philo;
 
-// Structs
+typedef struct s_philo
+{
+	int				id;
+	int				meals_eaten;
+	uint64_t		last_meal;
+	pthread_mutex_t	*first_fork;  // Sempre o garfo com menor índice
+	pthread_mutex_t	*second_fork; // Sempre o garfo com maior índice
+	t_data			*data;
+}	t_philo;
 
-struct s_data
+typedef struct s_data
 {
 	int				philo_count;
 	uint64_t		time_to_die;
@@ -36,32 +42,16 @@ struct s_data
 	int				someone_died;
 	uint64_t		start_time;
 	pthread_mutex_t	*forks;
-	pthread_mutex_t	mutex_print;
-	pthread_mutex_t	mutex_meal;
+	pthread_mutex_t	mutex_meal;   // Protege last_meal e meals_eaten
+	pthread_mutex_t	mutex_print;  // Protege printf
+	pthread_mutex_t	mutex_death;  // Protege someone_died
 	t_philo			*philos;
-};
+}	t_data;
 
-struct s_philo
-{
-	int				id;
-	int				meals_eaten;
-	uint64_t		last_meal;
-	pthread_t		thread;
-	pthread_mutex_t	*left_fork;
-	pthread_mutex_t	*right_fork;
-	t_data			*data;
-};
-
-// Init (init.c)
+// Function prototypes
 int			init_data(t_data *data, int argc, char **argv);
-
-// Routine (routine.c)
 void		*philo_routine(void *arg);
-
-// Monitor (monitor.c)
 void		*monitor_death(void *arg);
-
-// Utils (utils.c)
 uint64_t	get_time(void);
 uint64_t	get_relative_time(t_data *data);
 void		custom_sleep(uint64_t ms);

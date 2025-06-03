@@ -6,7 +6,7 @@
 /*   By: sabsanto <sabsanto@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 20:13:10 by sabsanto          #+#    #+#             */
-/*   Updated: 2025/06/03 14:46:22 by sabsanto         ###   ########.fr       */
+/*   Updated: 2025/06/03 17:10:49 by sabsanto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ void	clean_all(t_data *data)
 	}
 	pthread_mutex_destroy(&data->mutex_print);
 	pthread_mutex_destroy(&data->mutex_meal);
+	pthread_mutex_destroy(&data->mutex_death);
 	if (data->philos)
 	{
 		free(data->philos);

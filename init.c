@@ -6,7 +6,7 @@
 /*   By: sabsanto <sabsanto@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 20:12:51 by sabsanto          #+#    #+#             */
-/*   Updated: 2025/06/03 15:07:20 by sabsanto         ###   ########.fr       */
+/*   Updated: 2025/06/03 17:05:29 by sabsanto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,10 +58,25 @@ static void	init_philos(t_data *data)
 	{
 		data->philos[i].id = i + 1;
 		data->philos[i].meals_eaten = 0;
-		data->philos[i].last_meal = data->start_time;  //usar start_time
+		
+		pthread_mutex_lock(&data->mutex_meal);
+		data->philos[i].last_meal = data->start_time;
+		pthread_mutex_unlock(&data->mutex_meal);
+		
 		data->philos[i].data = data;
-		data->philos[i].left_fork = &data->forks[i];
-		data->philos[i].right_fork = &data->forks[(i + 1) % data->philo_count];
+		
+		// PADRONIZAÇÃO DA ORDEM DOS GARFOS
+		// Sempre pegar o garfo com menor índice primeiro para evitar deadlock
+		if (i < (i + 1) % data->philo_count)
+		{
+			data->philos[i].first_fork = &data->forks[i];
+			data->philos[i].second_fork = &data->forks[(i + 1) % data->philo_count];
+		}
+		else
+		{
+			data->philos[i].first_fork = &data->forks[(i + 1) % data->philo_count];
+			data->philos[i].second_fork = &data->forks[i];
+		}
 		i++;
 	}
 }
@@ -84,24 +99,33 @@ static void	init_basic_data(t_data *data, int argc, char **argv)
 int	init_data(t_data *data, int argc, char **argv)
 {
 	init_basic_data(data, argc, argv);
-	if (init_forks(data))
-		return (1);
+	
+	// Inicializar mutexes primeiro
 	if (pthread_mutex_init(&data->mutex_meal, NULL) != 0)
-	{
-		clean_all(data);
 		return (1);
-	}
 	if (pthread_mutex_init(&data->mutex_print, NULL) != 0)
 	{
 		pthread_mutex_destroy(&data->mutex_meal);
-		clean_all(data);
 		return (1);
 	}
-	data->philos = malloc(sizeof(t_philo) * data->philo_count);
-	if (!data->philos)
+	if (pthread_mutex_init(&data->mutex_death, NULL) != 0)
 	{
 		pthread_mutex_destroy(&data->mutex_meal);
 		pthread_mutex_destroy(&data->mutex_print);
+		return (1);
+	}
+	
+	if (init_forks(data))
+	{
+		pthread_mutex_destroy(&data->mutex_meal);
+		pthread_mutex_destroy(&data->mutex_print);
+		pthread_mutex_destroy(&data->mutex_death);
+		return (1);
+	}
+	
+	data->philos = malloc(sizeof(t_philo) * data->philo_count);
+	if (!data->philos)
+	{
 		clean_all(data);
 		return (1);
 	}

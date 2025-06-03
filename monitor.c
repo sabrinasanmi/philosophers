@@ -6,7 +6,7 @@
 /*   By: sabsanto <sabsanto@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 10:24:32 by sabsanto          #+#    #+#             */
-/*   Updated: 2025/06/03 15:07:38 by sabsanto         ###   ########.fr       */
+/*   Updated: 2025/06/03 17:06:06 by sabsanto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ static int	philo_died(t_philo *philo)
 {
 	uint64_t	now;
 	uint64_t	time_since_meal;
+	int			died = 0;
 
 	now = get_time();
 	pthread_mutex_lock(&philo->data->mutex_meal);
@@ -23,11 +24,21 @@ static int	philo_died(t_philo *philo)
 
 	if (time_since_meal > philo->data->time_to_die)
 	{
-		philo->data->someone_died = 1;
+		pthread_mutex_lock(&philo->data->mutex_death);
+		if (philo->data->someone_died == 0)
+		{
+			philo->data->someone_died = 1;
+			died = 1;
+		}
+		pthread_mutex_unlock(&philo->data->mutex_death);
+		
+		if (died)
+		{
+			pthread_mutex_lock(&philo->data->mutex_print);
+			printf("%lu %d died\n", get_relative_time(philo->data), philo->id);
+			pthread_mutex_unlock(&philo->data->mutex_print);
+		}
 		pthread_mutex_unlock(&philo->data->mutex_meal);
-		pthread_mutex_lock(&philo->data->mutex_print);
-		printf("%lu %d died\n", get_relative_time(philo->data), philo->id);
-		pthread_mutex_unlock(&philo->data->mutex_print);
 		return (1);
 	}
 	pthread_mutex_unlock(&philo->data->mutex_meal);
@@ -54,16 +65,26 @@ static int	all_ate_enough(t_data *data)
 	return (satisfied == data->philo_count);
 }
 
+static int	check_death_flag(t_data *data)
+{
+	int result;
+	
+	pthread_mutex_lock(&data->mutex_death);
+	result = data->someone_died;
+	pthread_mutex_unlock(&data->mutex_death);
+	return (result);
+}
+
 void	*monitor_death(void *arg)
 {
 	t_data	*data;
 	int		i;
 
 	data = (t_data *)arg;
-	while (1)
+	while (!check_death_flag(data))
 	{
 		i = 0;
-		while (i < data->philo_count)
+		while (i < data->philo_count && !check_death_flag(data))
 		{
 			if (philo_died(&data->philos[i]))
 				return (NULL);
@@ -71,9 +92,12 @@ void	*monitor_death(void *arg)
 		}
 		if (all_ate_enough(data))
 		{
+			pthread_mutex_lock(&data->mutex_death);
 			data->someone_died = 1;
+			pthread_mutex_unlock(&data->mutex_death);
 			return (NULL);
 		}
 		usleep(500);
 	}
+	return (NULL);
 }
