@@ -6,7 +6,7 @@
 /*   By: sabsanto <sabsanto@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 10:16:22 by sabsanto          #+#    #+#             */
-/*   Updated: 2025/06/03 17:08:24 by sabsanto         ###   ########.fr       */
+/*   Updated: 2025/06/03 17:27:43 by sabsanto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,19 @@ static int	check_death_status(t_philo *philo)
 
 static void	eat(t_philo *philo)
 {
+	// CASO ESPECIAL: Apenas 1 filósofo
+	if (philo->data->philo_count == 1)
+	{
+		pthread_mutex_lock(philo->first_fork);
+		print_action(philo, "has taken a fork");
+		
+		// Com apenas um garfo, o filósofo não pode comer e morrerá
+		custom_sleep(philo->data->time_to_die + 1);
+		
+		pthread_mutex_unlock(philo->first_fork);
+		return;
+	}
+	
 	// ORDEM PADRONIZADA - sempre pegar primeiro o garfo com menor índice
 	pthread_mutex_lock(philo->first_fork);
 	print_action(philo, "has taken a fork");
@@ -66,7 +79,6 @@ static void	eat(t_philo *philo)
 	pthread_mutex_unlock(philo->first_fork);
 	pthread_mutex_unlock(philo->second_fork);
 }
-
 void	*philo_routine(void *arg)
 {
 	t_philo	*philo;
