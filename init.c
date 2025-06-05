@@ -6,7 +6,7 @@
 /*   By: sabsanto <sabsanto@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 20:12:51 by sabsanto          #+#    #+#             */
-/*   Updated: 2025/06/03 17:05:29 by sabsanto         ###   ########.fr       */
+/*   Updated: 2025/06/03 17:24:45 by sabsanto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ static int	init_forks(t_data *data)
 static void	init_philos(t_data *data)
 {
 	int	i;
+	int left_fork, right_fork;
 
 	i = 0;
 	while (i < data->philo_count)
@@ -65,17 +66,20 @@ static void	init_philos(t_data *data)
 		
 		data->philos[i].data = data;
 		
-		// PADRONIZAÇÃO DA ORDEM DOS GARFOS
+		// CORREÇÃO: Calcular índices dos garfos corretamente
+		left_fork = i;
+		right_fork = (i + 1) % data->philo_count;
+		
 		// Sempre pegar o garfo com menor índice primeiro para evitar deadlock
-		if (i < (i + 1) % data->philo_count)
+		if (left_fork < right_fork)
 		{
-			data->philos[i].first_fork = &data->forks[i];
-			data->philos[i].second_fork = &data->forks[(i + 1) % data->philo_count];
+			data->philos[i].first_fork = &data->forks[left_fork];
+			data->philos[i].second_fork = &data->forks[right_fork];
 		}
 		else
 		{
-			data->philos[i].first_fork = &data->forks[(i + 1) % data->philo_count];
-			data->philos[i].second_fork = &data->forks[i];
+			data->philos[i].first_fork = &data->forks[right_fork];
+			data->philos[i].second_fork = &data->forks[left_fork];
 		}
 		i++;
 	}
