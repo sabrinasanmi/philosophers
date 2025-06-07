@@ -6,7 +6,7 @@
 /*   By: sabsanto <sabsanto@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 19:21:10 by sabsanto          #+#    #+#             */
-/*   Updated: 2025/06/03 17:12:41 by sabsanto         ###   ########.fr       */
+/*   Updated: 2025/06/06 22:11:36 by sabsanto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,9 @@ typedef struct s_philo
 	int				id;
 	int				meals_eaten;
 	uint64_t		last_meal;
-	pthread_mutex_t	*first_fork;  // Sempre o garfo com menor índice
-	pthread_mutex_t	*second_fork; // Sempre o garfo com maior índice
+	pthread_mutex_t	*first_fork;
+	pthread_mutex_t	*second_fork;
+	pthread_t		thread;
 	t_data			*data;
 }	t_philo;
 
@@ -42,14 +43,14 @@ typedef struct s_data
 	int				someone_died;
 	uint64_t		start_time;
 	pthread_mutex_t	*forks;
-	pthread_mutex_t	mutex_meal;   // Protege last_meal e meals_eaten
-	pthread_mutex_t	mutex_print;  // Protege printf
-	pthread_mutex_t	mutex_death;  // Protege someone_died
+	pthread_mutex_t	mutex_meal;
+	pthread_mutex_t	mutex_print;
+	pthread_mutex_t	mutex_death;
 	t_philo			*philos;
 }	t_data;
 
-// Function prototypes
 int			init_data(t_data *data, int argc, char **argv);
+void		init_philos(t_data *data);
 void		*philo_routine(void *arg);
 void		*monitor_death(void *arg);
 uint64_t	get_time(void);

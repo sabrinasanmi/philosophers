@@ -6,22 +6,29 @@
 /*   By: sabsanto <sabsanto@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 10:24:32 by sabsanto          #+#    #+#             */
-/*   Updated: 2025/06/03 17:06:06 by sabsanto         ###   ########.fr       */
+/*   Updated: 2025/06/06 22:06:15 by sabsanto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
+static void	print_death(t_philo *philo)
+{
+	pthread_mutex_lock(&philo->data->mutex_print);
+	printf("%lu %d died\n", get_relative_time(philo->data), philo->id);
+	pthread_mutex_unlock(&philo->data->mutex_print);
+}
+
 static int	philo_died(t_philo *philo)
 {
 	uint64_t	now;
 	uint64_t	time_since_meal;
-	int			died = 0;
+	int			died;
 
+	died = 0;
 	now = get_time();
 	pthread_mutex_lock(&philo->data->mutex_meal);
 	time_since_meal = now - philo->last_meal;
-
 	if (time_since_meal > philo->data->time_to_die)
 	{
 		pthread_mutex_lock(&philo->data->mutex_death);
@@ -31,13 +38,8 @@ static int	philo_died(t_philo *philo)
 			died = 1;
 		}
 		pthread_mutex_unlock(&philo->data->mutex_death);
-		
 		if (died)
-		{
-			pthread_mutex_lock(&philo->data->mutex_print);
-			printf("%lu %d died\n", get_relative_time(philo->data), philo->id);
-			pthread_mutex_unlock(&philo->data->mutex_print);
-		}
+			print_death(philo);
 		pthread_mutex_unlock(&philo->data->mutex_meal);
 		return (1);
 	}
@@ -67,8 +69,8 @@ static int	all_ate_enough(t_data *data)
 
 static int	check_death_flag(t_data *data)
 {
-	int result;
-	
+	int	result;
+
 	pthread_mutex_lock(&data->mutex_death);
 	result = data->someone_died;
 	pthread_mutex_unlock(&data->mutex_death);

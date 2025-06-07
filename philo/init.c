@@ -6,7 +6,7 @@
 /*   By: sabsanto <sabsanto@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 20:12:51 by sabsanto          #+#    #+#             */
-/*   Updated: 2025/06/03 17:24:45 by sabsanto         ###   ########.fr       */
+/*   Updated: 2025/06/06 21:49:44 by sabsanto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,40 +49,22 @@ static int	init_forks(t_data *data)
 	return (0);
 }
 
-static void	init_philos(t_data *data)
+static int	init_mutexes(t_data *data)
 {
-	int	i;
-	int left_fork, right_fork;
-
-	i = 0;
-	while (i < data->philo_count)
+	if (pthread_mutex_init(&data->mutex_meal, NULL) != 0)
+		return (1);
+	if (pthread_mutex_init(&data->mutex_print, NULL) != 0)
 	{
-		data->philos[i].id = i + 1;
-		data->philos[i].meals_eaten = 0;
-		
-		pthread_mutex_lock(&data->mutex_meal);
-		data->philos[i].last_meal = data->start_time;
-		pthread_mutex_unlock(&data->mutex_meal);
-		
-		data->philos[i].data = data;
-		
-		// CORREÇÃO: Calcular índices dos garfos corretamente
-		left_fork = i;
-		right_fork = (i + 1) % data->philo_count;
-		
-		// Sempre pegar o garfo com menor índice primeiro para evitar deadlock
-		if (left_fork < right_fork)
-		{
-			data->philos[i].first_fork = &data->forks[left_fork];
-			data->philos[i].second_fork = &data->forks[right_fork];
-		}
-		else
-		{
-			data->philos[i].first_fork = &data->forks[right_fork];
-			data->philos[i].second_fork = &data->forks[left_fork];
-		}
-		i++;
+		pthread_mutex_destroy(&data->mutex_meal);
+		return (1);
 	}
+	if (pthread_mutex_init(&data->mutex_death, NULL) != 0)
+	{
+		pthread_mutex_destroy(&data->mutex_meal);
+		pthread_mutex_destroy(&data->mutex_print);
+		return (1);
+	}
+	return (0);
 }
 
 static void	init_basic_data(t_data *data, int argc, char **argv)
@@ -103,22 +85,8 @@ static void	init_basic_data(t_data *data, int argc, char **argv)
 int	init_data(t_data *data, int argc, char **argv)
 {
 	init_basic_data(data, argc, argv);
-	
-	// Inicializar mutexes primeiro
-	if (pthread_mutex_init(&data->mutex_meal, NULL) != 0)
+	if (init_mutexes(data))
 		return (1);
-	if (pthread_mutex_init(&data->mutex_print, NULL) != 0)
-	{
-		pthread_mutex_destroy(&data->mutex_meal);
-		return (1);
-	}
-	if (pthread_mutex_init(&data->mutex_death, NULL) != 0)
-	{
-		pthread_mutex_destroy(&data->mutex_meal);
-		pthread_mutex_destroy(&data->mutex_print);
-		return (1);
-	}
-	
 	if (init_forks(data))
 	{
 		pthread_mutex_destroy(&data->mutex_meal);
@@ -126,7 +94,6 @@ int	init_data(t_data *data, int argc, char **argv)
 		pthread_mutex_destroy(&data->mutex_death);
 		return (1);
 	}
-	
 	data->philos = malloc(sizeof(t_philo) * data->philo_count);
 	if (!data->philos)
 	{

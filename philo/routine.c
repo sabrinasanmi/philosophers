@@ -6,7 +6,7 @@
 /*   By: sabsanto <sabsanto@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 10:16:22 by sabsanto          #+#    #+#             */
-/*   Updated: 2025/06/03 17:27:43 by sabsanto         ###   ########.fr       */
+/*   Updated: 2025/06/06 21:53:17 by sabsanto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,87 +24,72 @@ static void	print_action(t_philo *philo, char *msg)
 
 static int	check_death_status(t_philo *philo)
 {
-	int result;
-	
+	int	result;
+
 	pthread_mutex_lock(&philo->data->mutex_death);
 	result = philo->data->someone_died;
 	pthread_mutex_unlock(&philo->data->mutex_death);
 	return (result);
 }
 
-static void	eat(t_philo *philo)
+static int	try_eat(t_philo *philo)
 {
-	// CASO ESPECIAL: Apenas 1 filósofo
 	if (philo->data->philo_count == 1)
 	{
 		pthread_mutex_lock(philo->first_fork);
 		print_action(philo, "has taken a fork");
-		
-		// Com apenas um garfo, o filósofo não pode comer e morrerá
 		custom_sleep(philo->data->time_to_die + 1);
-		
 		pthread_mutex_unlock(philo->first_fork);
-		return;
+		return (1);
 	}
-	
-	// ORDEM PADRONIZADA - sempre pegar primeiro o garfo com menor índice
 	pthread_mutex_lock(philo->first_fork);
 	print_action(philo, "has taken a fork");
-	
 	if (check_death_status(philo))
 	{
 		pthread_mutex_unlock(philo->first_fork);
-		return;
+		return (1);
 	}
-	
 	pthread_mutex_lock(philo->second_fork);
 	print_action(philo, "has taken a fork");
-	
 	if (check_death_status(philo))
 	{
 		pthread_mutex_unlock(philo->first_fork);
 		pthread_mutex_unlock(philo->second_fork);
-		return;
+		return (1);
 	}
-	
-	// PROTEÇÃO DE ACESSO ÀS VARIÁVEIS COMPARTILHADAS
+	return (0);
+}
+
+static void	finish_eating(t_philo *philo)
+{
 	pthread_mutex_lock(&philo->data->mutex_meal);
 	print_action(philo, "is eating");
 	philo->last_meal = get_time();
 	philo->meals_eaten++;
 	pthread_mutex_unlock(&philo->data->mutex_meal);
-	
 	custom_sleep(philo->data->time_to_eat);
-	
 	pthread_mutex_unlock(philo->first_fork);
 	pthread_mutex_unlock(philo->second_fork);
 }
+
 void	*philo_routine(void *arg)
 {
 	t_philo	*philo;
 
 	philo = (t_philo *)arg;
-
-	// Stagger even philosophers to reduce contention
 	if (philo->id % 2 == 0)
 		custom_sleep(10);
-
 	while (!check_death_status(philo))
 	{
-		eat(philo);
-
+		if (try_eat(philo) == 0)
+			finish_eating(philo);
 		if (check_death_status(philo))
-			break;
-
+			break ;
 		print_action(philo, "is sleeping");
 		custom_sleep(philo->data->time_to_sleep);
-
 		if (check_death_status(philo))
-			break;
-
+			break ;
 		print_action(philo, "is thinking");
-		
-		// Small thinking time to prevent busy waiting
 		if (philo->data->philo_count % 2 == 1)
 			custom_sleep(1);
 	}

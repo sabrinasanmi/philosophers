@@ -6,7 +6,7 @@
 /*   By: sabsanto <sabsanto@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 19:21:05 by sabsanto          #+#    #+#             */
-/*   Updated: 2025/05/30 17:05:06 by sabsanto         ###   ########.fr       */
+/*   Updated: 2025/06/06 18:12:18 by sabsanto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ int	main(int argc, char **argv)
 
 	error = 0;
 	if (argc < 5 || argc > 6)
-		return (printf("Uso: ./philo n_philos t_die t_eat t_sleep [max_meals]\n"));
+		return (printf("Uso: ./philo n_phi t_die t_eat t_sleep [max_meals]\n"));
 	if (init_data(&data, argc, argv) != 0)
 	{
 		printf("Erro na inicialização dos dados.\n");
