@@ -6,7 +6,7 @@
 /*   By: sabsanto <sabsanto@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 19:21:05 by sabsanto          #+#    #+#             */
-/*   Updated: 2025/06/06 18:12:18 by sabsanto         ###   ########.fr       */
+/*   Updated: 2025/08/14 02:54:23 by sabsanto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,12 +45,12 @@ static int	run_simulation(t_data *data)
 
 	if (start_threads(data) != 0)
 	{
-		printf("Erro ao criar threads dos filósofos.\n");
+		printf("Error creating philosopher threads.\n");
 		return (1);
 	}
 	if (pthread_create(&monitor, NULL, monitor_death, data) != 0)
 	{
-		printf("Erro ao criar monitor.\n");
+		printf("Error creating monitor thread.\n");
 		data->someone_died = 1;
 		wait_threads(data);
 		return (1);
@@ -70,7 +70,7 @@ int	main(int argc, char **argv)
 		return (printf("Uso: ./philo n_phi t_die t_eat t_sleep [max_meals]\n"));
 	if (init_data(&data, argc, argv) != 0)
 	{
-		printf("Erro na inicialização dos dados.\n");
+		printf("Error initializing data.\n");
 		return (1);
 	}
 	error = run_simulation(&data);

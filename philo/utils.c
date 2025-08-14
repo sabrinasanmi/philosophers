@@ -6,11 +6,28 @@
 /*   By: sabsanto <sabsanto@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 20:13:10 by sabsanto          #+#    #+#             */
-/*   Updated: 2025/06/06 22:13:26 by sabsanto         ###   ########.fr       */
+/*   Updated: 2025/08/14 02:30:57 by sabsanto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+int	ft_atoi(const char *str)
+{
+	long	res;
+	int		i;
+
+	res = 0;
+	i = 0;
+	while (str[i] >= '0' && str[i] <= '9')
+	{
+		res = res * 10 + (str[i] - '0');
+		if (res > 2147483647)
+			return (-1);
+		i++;
+	}
+	return ((int)res);
+}
 
 uint64_t	get_time(void)
 {

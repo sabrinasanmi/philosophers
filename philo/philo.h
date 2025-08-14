@@ -6,7 +6,7 @@
 /*   By: sabsanto <sabsanto@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 19:21:10 by sabsanto          #+#    #+#             */
-/*   Updated: 2025/06/06 22:11:36 by sabsanto         ###   ########.fr       */
+/*   Updated: 2025/08/14 02:44:01 by sabsanto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,13 +49,16 @@ typedef struct s_data
 	t_philo			*philos;
 }	t_data;
 
+int			ft_atoi(const char *str);
+uint64_t	get_time(void);
+uint64_t	get_relative_time(t_data *data);
+void		custom_sleep(uint64_t ms);
+int			check_args(char **argv);
+int			validate_data(t_data *data, int argc);
 int			init_data(t_data *data, int argc, char **argv);
 void		init_philos(t_data *data);
 void		*philo_routine(void *arg);
 void		*monitor_death(void *arg);
-uint64_t	get_time(void);
-uint64_t	get_relative_time(t_data *data);
-void		custom_sleep(uint64_t ms);
 void		clean_all(t_data *data);
 
 #endif
