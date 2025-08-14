@@ -6,7 +6,7 @@
 #    By: sabsanto <sabsanto@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/15 19:21:14 by sabsanto          #+#    #+#              #
-#    Updated: 2025/08/13 20:20:41 by sabsanto         ###   ########.fr        #
+#    Updated: 2025/08/14 02:14:12 by sabsanto         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,7 @@ OBJS        = $(SRCS:.c=.o)
 
 $(NAME): $(OBJS)
 	$(CC) $(CFLAGS) -o $(NAME) $(OBJS)
-
+	
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
@@ -33,4 +33,3 @@ fclean: clean
 re: fclean all
 
 .PHONY: all clean fclean re
-
