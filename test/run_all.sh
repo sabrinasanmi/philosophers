@@ -18,11 +18,11 @@ run_test() {
 	fi
 }
 
-run_test ./test/test_one_philo.sh
-run_test ./test/test_basic.sh
-run_test ./test/test_eat_limit.sh
-run_test ./test/test_valgrind.sh
-run_test ./test/test_helgrind.sh
+run_test ./test_one_philo.sh
+run_test ./test_basic.sh
+run_test ./test_eat_limit.sh
+run_test ./test_valgrind.sh
+run_test ./test_helgrind.sh
 
 echo ""
 echo "=============================="

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "🧪 Teste com 1 filósofo (deve morrer)..."
-raw_output=$(./philo/philo 1 800 200 200)
+raw_output=$(../philo/philo 1 800 200 200)
 
 died_output=$(echo "$raw_output" | grep "died")
 
