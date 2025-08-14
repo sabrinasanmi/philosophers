@@ -1,0 +1,11 @@
+# Binário do projeto
+philo/philo
+
+# Logs e saídas de teste
+test/helgrind_log.txt
+test/philo_output_basic.txt
+test/philo_output_eat_limit.txt
+test/valgrind_log.txt
+
+# Arquivos objeto
+*.o
