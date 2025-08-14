@@ -6,18 +6,21 @@
 #    By: sabsanto <sabsanto@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/15 19:21:14 by sabsanto          #+#    #+#              #
-#    Updated: 2025/06/06 22:14:34 by sabsanto         ###   ########.fr        #
+#    Updated: 2025/08/13 20:20:41 by sabsanto         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME		= philo
-CC			= cc
-CFLAGS		= -Wall -Wextra -Werror -pthread -O2
-SRCS		= main.c utils.c routine.c init.c init_philos.c monitor.c
-OBJS		= $(SRCS:.c=.o)
+NAME        = philo
+CC          = cc
+CFLAGS      = -Wall -Wextra -Werror -pthread -O2
+SRCS        = main.c utils.c routine.c init.c init_philos.c monitor.c
+OBJS        = $(SRCS:.c=.o)
 
 $(NAME): $(OBJS)
 	$(CC) $(CFLAGS) -o $(NAME) $(OBJS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 all: $(NAME)
 
@@ -30,3 +33,4 @@ fclean: clean
 re: fclean all
 
 .PHONY: all clean fclean re
+

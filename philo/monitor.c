@@ -6,7 +6,7 @@
 /*   By: sabsanto <sabsanto@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 10:24:32 by sabsanto          #+#    #+#             */
-/*   Updated: 2025/06/06 22:06:15 by sabsanto         ###   ########.fr       */
+/*   Updated: 2025/08/13 19:50:54 by sabsanto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ void	*monitor_death(void *arg)
 			pthread_mutex_unlock(&data->mutex_death);
 			return (NULL);
 		}
-		usleep(500);
+		usleep(100);
 	}
 	return (NULL);
 }
