@@ -6,7 +6,7 @@
 /*   By: sabsanto <sabsanto@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 10:16:22 by sabsanto          #+#    #+#             */
-/*   Updated: 2025/06/06 21:53:17 by sabsanto         ###   ########.fr       */
+/*   Updated: 2025/08/14 01:30:25 by sabsanto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,16 +72,23 @@ static void	finish_eating(t_philo *philo)
 	pthread_mutex_unlock(philo->second_fork);
 }
 
-void	*philo_routine(void *arg)
-{
-	t_philo	*philo;
 
-	philo = (t_philo *)arg;
-	if (philo->id % 2 == 0)
-		custom_sleep(10);
-	while (!check_death_status(philo))
-	{
-		if (try_eat(philo) == 0)
+void *philo_routine(void *arg)
+{
+    t_philo *philo = (t_philo *)arg;
+
+    if (philo->data->philo_count == 1)
+    {
+        try_eat(philo); 
+        return NULL;
+    }
+
+    if (philo->id % 2 == 0)
+        custom_sleep(10);
+
+    while (!check_death_status(philo))
+    {
+        if (try_eat(philo) == 0)
 			finish_eating(philo);
 		if (check_death_status(philo))
 			break ;
@@ -93,5 +100,5 @@ void	*philo_routine(void *arg)
 		if (philo->data->philo_count % 2 == 1)
 			custom_sleep(1);
 	}
-	return (NULL);
+    return NULL;
 }
